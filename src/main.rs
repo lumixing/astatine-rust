@@ -1,3 +1,4 @@
 fn main() {
-    println!("Hello, world!");
+    let mut app = astatine::app();
+    app.run();
 }

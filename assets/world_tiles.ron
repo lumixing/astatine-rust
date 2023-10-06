@@ -1,0 +1,11 @@
+(
+	name: Some("world_tiles"),
+	id: 0,
+	tiles: {
+		0: "tiles/air.ron",
+		1: "tiles/grass.ron",
+		2: "tiles/dirt.ron",
+		3: "tiles/stone.ron",
+		4: "tiles/world_border.ron"
+	}
+)
