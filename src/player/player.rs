@@ -10,7 +10,7 @@ pub struct PlayerCamera;
 
 pub fn spawn_camera(mut commands: Commands) {
     let mut camera_bundle = Camera2dBundle::default();
-    camera_bundle.projection.scale = 2.0;
+    camera_bundle.projection.scale = 0.5;
     camera_bundle.camera_2d.clear_color = ClearColorConfig::Custom(Color::rgb(71./255., 209./255., 1.));
 
     commands.spawn((
@@ -72,7 +72,6 @@ pub fn update_positions(
     if *chunk_pos != new_chunk_pos {
         *chunk_pos = new_chunk_pos;
     }
-    info!("updated player chunkpos {}", new_chunk_pos.0);
 }
 
 pub fn follow_player(

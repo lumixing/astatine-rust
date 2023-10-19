@@ -41,10 +41,9 @@ pub fn spawn_chunks_near_player(
 
     despawn_all_chunks(&mut commands, &mut loaded_chunks);
     for y in -1..=1 {
-        for x in -1..=1 {
+        for x in -2..=2 {
             let chunk_pos_raw = ivec2(x + player_chunk_pos.0.x as i32, y + player_chunk_pos.0.y as i32);
             let chunk_pos = ChunkPos(chunk_pos_raw);
-            info!("do i chunk at {}?", chunk_pos.0);
             if !chunk_pos.in_bounds() { continue; };
             // let chunk_pos = ChunkPos::new(chunk_pos_raw.x as u32, chunk_pos_raw.y as u32);
             let chunk_data = world_storage.get_chunk_data(chunk_pos).unwrap(); // else this if error
