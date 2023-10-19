@@ -5,7 +5,7 @@ use bevy_tileset::prelude::{Tilesets, Tileset};
 
 use crate::player::player::Player;
 
-use super::{position::{ChunkPos, CHUNK_SIZE, BLOCK_SIZE}, storage::{ChunkData, WorldStorage}};
+use super::{position::{ChunkPos, CHUNK_SIZE, BLOCK_SIZE}, storage::{ChunkData, WorldStorage}, block::Block};
 
 #[derive(Resource, Default)]
 pub struct LoadedChunks(HashMap<ChunkPos, Entity>);
@@ -88,12 +88,22 @@ fn spawn_chunk(
             for y in 0..CHUNK_SIZE {
                 for x in 0..CHUNK_SIZE {
                     let tile = chunk_data.get_block(ivec2(x, y)).unwrap();
+                    let (flip_x, flip_y) = if Block::from(tile).should_flip() {
+                        chunk_data.get_flip(ivec2(x, y)).unwrap()
+                    } else {
+                        (false, false)
+                    };
                     
                     let tile_pos = TilePos { x: x as u32, y: y as u32 };
                     let tile_entity = builder.spawn(TileBundle {
                         position: tile_pos,
                         texture_index: TileTextureIndex(tile as u32),
                         tilemap_id: TilemapId(builder.parent_entity()),
+                        flip: TileFlip {
+                            x: flip_x,
+                            y: flip_y,
+                            ..default()
+                        },
                         ..default()
                     }).id();
                     tile_storage.set(&tile_pos, tile_entity);

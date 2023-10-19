@@ -10,6 +10,7 @@ pub(crate) mod position;
 mod storage;
 pub(crate) mod chunks;
 mod gen;
+mod block;
 
 #[allow(dead_code)]
 #[derive(AssetCollection, Resource)]

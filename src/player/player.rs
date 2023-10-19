@@ -27,7 +27,7 @@ pub fn spawn_player(mut commands: Commands) {
                 ..default()
             },
             transform: Transform {
-                translation: vec3(100.0, 100.0, 20.0),
+                translation: vec3(100.0, 7.0*32.0*8.0, 20.0),
                 scale: vec3(8.0, 16.0, 8.0),
                 ..default()
             },
