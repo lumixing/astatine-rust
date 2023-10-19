@@ -26,6 +26,7 @@ pub const BLOCK_SIZE: i32 = 8;
 pub const CHUNK_SIZE: i32 = 32; // size in blocks
 pub const WORLD_SIZE: IVec2 = ivec2(8, 8); // size in chunks
 
+/// relative to chunk block_pos to linearized relative to chunk block_index 
 pub fn linearize(block_pos: IVec2) -> usize {
     (block_pos.x + CHUNK_SIZE * block_pos.y) as usize
 }

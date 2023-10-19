@@ -87,7 +87,7 @@ fn spawn_chunk(
         .with_children(|builder| {
             for y in 0..CHUNK_SIZE {
                 for x in 0..CHUNK_SIZE {
-                    let tile = chunk_data.get_tile(ivec2(x, y)).unwrap();
+                    let tile = chunk_data.get_block(ivec2(x, y)).unwrap();
                     
                     let tile_pos = TilePos { x: x as u32, y: y as u32 };
                     let tile_entity = builder.spawn(TileBundle {
