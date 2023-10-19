@@ -1,7 +1,13 @@
 use bevy::{prelude::*, utils::HashMap, math::ivec2};
 use rand::prelude::*;
 
-use super::{position::{ChunkPos, WORLD_CHUNK_SIZE, CHUNK_SIZE, linearize}, block::Block};
+use super::{position::{ChunkPos, linearize}, block::Block, chunks::CHUNK_SIZE};
+
+pub const WORLD_CHUNK_SIZE: IVec2 = ivec2(8, 8);
+pub const WORLD_BLOCK_SIZE: IVec2 = IVec2 {
+    x: WORLD_CHUNK_SIZE.x * CHUNK_SIZE,
+    y: WORLD_CHUNK_SIZE.y * CHUNK_SIZE
+};
 
 #[derive(Resource)]
 pub struct WorldStorage(HashMap<ChunkPos, ChunkData>);

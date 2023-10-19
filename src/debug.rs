@@ -3,6 +3,8 @@ use bevy_egui::{EguiContexts, egui};
 
 use crate::{physics::Velocity, player::player::Player, world::chunks::Colls};
 
+#[allow(dead_code)]
+
 pub fn chunk_borders(
     mut gizmos: Gizmos
 ) {

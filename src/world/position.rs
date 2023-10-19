@@ -1,4 +1,6 @@
-use bevy::{prelude::*, math::ivec2};
+use bevy::prelude::*;
+
+use super::{storage::WORLD_CHUNK_SIZE, chunks::CHUNK_SIZE};
 
 #[derive(Component, Eq, Hash, Copy, Clone)]
 pub struct ChunkPos(pub IVec2);
@@ -21,14 +23,6 @@ impl PartialEq for ChunkPos {
         self.0.x == other.0.x && self.0.y == other.0.y
     }
 }
-
-pub const BLOCK_SIZE: i32 = 8;
-pub const CHUNK_SIZE: i32 = 32; // size in blocks
-pub const WORLD_CHUNK_SIZE: IVec2 = ivec2(8, 8); // size in chunks
-pub const WORLD_BLOCK_SIZE: IVec2 = IVec2 {
-    x: WORLD_CHUNK_SIZE.x * CHUNK_SIZE,
-    y: WORLD_CHUNK_SIZE.y * CHUNK_SIZE
-}; // size in blocks
 
 /// relative to chunk block_pos to linearized relative to chunk block_index 
 pub fn linearize(block_pos: IVec2) -> usize {

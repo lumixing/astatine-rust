@@ -5,7 +5,10 @@ use bevy_tileset::prelude::{Tilesets, Tileset};
 
 use crate::player::player::Player;
 
-use super::{position::{ChunkPos, CHUNK_SIZE, BLOCK_SIZE}, storage::{ChunkData, WorldStorage}, block::Block};
+use super::{position::ChunkPos, storage::{ChunkData, WorldStorage}, block::Block};
+
+pub const BLOCK_SIZE: i32 = 8;
+pub const CHUNK_SIZE: i32 = 32;
 
 #[derive(Resource)]
 pub struct Colls(pub HashSet<IVec2>);

@@ -4,7 +4,7 @@ use rand::prelude::*;
 
 use crate::states::GameState;
 
-use super::{storage::WorldStorage, position::WORLD_BLOCK_SIZE, block::Block};
+use super::{storage::{WorldStorage, WORLD_BLOCK_SIZE}, block::Block};
 
 const SURFACE_LENGTH: f64 = 24.0;
 const SURFACE_HEIGHT: f64 = 12.0;
