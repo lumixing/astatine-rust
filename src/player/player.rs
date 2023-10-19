@@ -1,6 +1,6 @@
 use bevy::{prelude::*, core_pipeline::clear_color::ClearColorConfig, math::vec3};
 
-use crate::world::position::ChunkPos;
+use crate::{world::position::ChunkPos, physics::Velocity};
 
 #[derive(Component)]
 pub struct Player;
@@ -34,7 +34,8 @@ pub fn spawn_player(mut commands: Commands) {
             ..default()
         },
         Player,
-        ChunkPos(IVec2::ZERO)
+        ChunkPos(IVec2::ZERO),
+        Velocity(Vec2::ZERO)
     ));
 }
 

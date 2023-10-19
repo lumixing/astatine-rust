@@ -6,6 +6,8 @@ mod states;
 mod player;
 mod world;
 mod debug;
+mod entities;
+mod physics;
 
 pub fn app() -> App {
     let mut app = App::new();
@@ -27,12 +29,16 @@ pub fn app() -> App {
             .set(ImagePlugin::default_nearest()),
         world::WorldPlugin,
         player::PlayerPlugin,
+        entities::EntitiesPlugin,
+        physics::PhysicsPlugin,
     ));
 
     app.add_systems(Update, (   
         bevy::window::close_on_esc,
-        debug::chunk_borders
-    ));
+        // debug::chunk_borders,
+        debug::debug_text,
+        debug::draw_colls,
+    ).run_if(in_state(GameState::InGame)));
 
     app
 }
