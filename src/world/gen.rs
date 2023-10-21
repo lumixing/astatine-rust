@@ -6,7 +6,7 @@ use crate::states::GameState;
 
 use super::{storage::{WorldStorage, WORLD_BLOCK_SIZE}, block::Block};
 
-const SURFACE_LENGTH: f64 = 24.0;
+const SURFACE_LENGTH: f64 = 48.0;
 const SURFACE_HEIGHT: f64 = 12.0;
 const SURFACE_OFFSET: f64 = 30.0;
 

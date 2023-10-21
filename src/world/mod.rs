@@ -5,7 +5,7 @@ use bevy_tileset::prelude::Tileset;
 
 use crate::states::GameState;
 
-use self::{gen::generate, chunks::Colls};
+use self::{gen::generate, chunks::{Colls, ReloadChunks}};
 
 pub(crate) mod position;
 mod storage;
@@ -35,6 +35,7 @@ impl Plugin for WorldPlugin {
         app.add_collection_to_loading_state::<_, TileTextures>(GameState::AssetLoading);
         app.init_resource::<chunks::LoadedChunks>(); 
         app.insert_resource(Colls(HashSet::new()));
+        app.add_event::<ReloadChunks>();
 
         app.add_systems(OnEnter(GameState::WorldGeneration), generate);
 

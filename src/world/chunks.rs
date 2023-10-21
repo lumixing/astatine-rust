@@ -16,6 +16,9 @@ pub struct Colls(pub HashSet<IVec2>);
 #[derive(Resource, Default)]
 pub struct LoadedChunks(HashMap<ChunkPos, Entity>);
 
+#[derive(Event)]
+pub struct ReloadChunks;
+
 #[allow(dead_code)]
 impl LoadedChunks {
     pub fn get_chunk(&self, chunk_pos: ChunkPos) -> Option<&Entity> {
@@ -41,8 +44,10 @@ pub fn spawn_chunks_near_player(
     mut loaded_chunks: ResMut<LoadedChunks>,
     mut colls: ResMut<Colls>,
     world_storage: Res<WorldStorage>,
-    player_query: Query<&ChunkPos, (With<Player>, Changed<ChunkPos>)>
+    player_query: Query<&ChunkPos, With<Player>>,
+    reload_event: EventReader<ReloadChunks>,
 ) {
+    if reload_event.is_empty() { return; };
     let tileset = tilesets.get_by_name("world_tiles").unwrap();
     let Ok(player_chunk_pos) = player_query.get_single() else { return };
 

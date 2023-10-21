@@ -1,6 +1,6 @@
 use bevy::{prelude::*, core_pipeline::clear_color::ClearColorConfig, math::vec3};
 
-use crate::{world::position::ChunkPos, physics::{Velocity, Rigidbody}};
+use crate::{world::{position::ChunkPos, chunks::ReloadChunks}, physics::{Velocity, Rigidbody}};
 
 #[derive(Component)]
 pub struct Player;
@@ -62,7 +62,8 @@ pub fn movement(
 }
 
 pub fn update_positions(
-    mut player_query: Query<(&Transform, &mut ChunkPos), With<Player>>
+    mut player_query: Query<(&Transform, &mut ChunkPos), With<Player>>,
+    mut reload_event: EventWriter<ReloadChunks>,
 ) {
     let (transform, mut chunk_pos) = player_query.single_mut();
     let translation = IVec2 {
@@ -73,6 +74,7 @@ pub fn update_positions(
     let new_chunk_pos = ChunkPos::from_block_pos(translation);
     if *chunk_pos != new_chunk_pos {
         *chunk_pos = new_chunk_pos;
+        reload_event.send(ReloadChunks);
     }
 }
 
