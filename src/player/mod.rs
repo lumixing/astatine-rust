@@ -2,21 +2,28 @@ use bevy::prelude::*;
 
 use crate::states::GameState;
 
+use self::camera::CursorPosition;
+
 pub mod player;
+pub mod camera;
 
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
+        app.insert_resource(CursorPosition(IVec2::ZERO)); 
+
         app.add_systems(OnEnter(GameState::InGame), (
-            player::spawn_camera,
+            camera::spawn_camera,
             player::spawn_player,
         ).chain());
 
         app.add_systems(Update, (
             player::movement,
             player::update_positions,
-            player::follow_player,
+            camera::follow_player,
+            camera::update_cursor_position,
+            player::mouse_input,
         ).run_if(in_state(GameState::InGame)).chain());
     }
 }

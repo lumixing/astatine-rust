@@ -1,23 +1,11 @@
-use bevy::{prelude::*, core_pipeline::clear_color::ClearColorConfig, math::vec3};
+use bevy::{prelude::*, math::vec3};
 
-use crate::{world::{position::ChunkPos, chunks::ReloadChunks}, physics::{Velocity, Rigidbody}};
+use crate::{world::{position::ChunkPos, chunks::ReloadChunks, storage::WorldStorage, block::Block}, physics::{Velocity, Rigidbody}};
+
+use super::camera::CursorPosition;
 
 #[derive(Component)]
 pub struct Player;
-
-#[derive(Component)]
-pub struct PlayerCamera;
-
-pub fn spawn_camera(mut commands: Commands) {
-    let mut camera_bundle = Camera2dBundle::default();
-    camera_bundle.projection.scale = 0.5;
-    camera_bundle.camera_2d.clear_color = ClearColorConfig::Custom(Color::rgb(71./255., 209./255., 1.));
-
-    commands.spawn((
-        camera_bundle,
-        PlayerCamera
-    ));
-}
 
 pub fn spawn_player(mut commands: Commands) {
     commands.spawn((
@@ -78,12 +66,17 @@ pub fn update_positions(
     }
 }
 
-pub fn follow_player(
-    mut camera_query: Query<&mut Transform, With<PlayerCamera>>,
-    player_query: Query<&Transform, (With<Player>, Without<PlayerCamera>)>
+pub fn mouse_input(
+    cursor_pos: Res<CursorPosition>,
+    mouse_input: Res<Input<MouseButton>>,
+    mut world_storage: ResMut<WorldStorage>,
+    mut reload_event: EventWriter<ReloadChunks>,
 ) {
-    let mut camera_transform = camera_query.single_mut();
-    let player_transform = player_query.single();
-
-    camera_transform.translation = player_transform.translation;
+    if mouse_input.pressed(MouseButton::Left) {
+        world_storage.set_block(cursor_pos.0, Block::Air);
+        reload_event.send(ReloadChunks);
+    } else if mouse_input.pressed(MouseButton::Right) {
+        world_storage.set_block(cursor_pos.0, Block::Dirt);
+        reload_event.send(ReloadChunks);
+    }
 }

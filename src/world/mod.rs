@@ -8,10 +8,10 @@ use crate::states::GameState;
 use self::{gen::generate, chunks::{Colls, ReloadChunks}};
 
 pub(crate) mod position;
-mod storage;
+pub(crate) mod storage;
 pub(crate) mod chunks;
 mod gen;
-mod block;
+pub(crate) mod block;
 
 #[allow(dead_code)]
 #[derive(AssetCollection, Resource)]
