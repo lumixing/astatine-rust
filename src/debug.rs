@@ -1,7 +1,7 @@
 use bevy::{prelude::*, math::vec2};
 use bevy_egui::{EguiContexts, egui};
 
-use crate::{physics::Velocity, player::{player::Player, camera::CursorPosition}, world::chunks::Colls};
+use crate::{physics::Velocity, player::{player::Player, camera::CursorPosition}, world::chunks::Colls, entities::item::Item};
 
 #[allow(dead_code)]
 pub fn chunk_borders(
@@ -29,6 +29,7 @@ pub fn draw_colls(
 pub fn debug_text(
     mut contexts: EguiContexts,
     player_query: Query<(&Transform, &Velocity, &Player)>,
+    item_query: Query<With<Item>>,
     colls: Res<Colls>,
     time: Res<Time>,
     cursor_pos: Res<CursorPosition>
@@ -41,5 +42,6 @@ pub fn debug_text(
         ui.label(format!("cpos: {}", cursor_pos.0));
         ui.label(format!("vel: {}", velocity.0));
         ui.label(format!("col: {}", colls.0.iter().count()));
+        ui.label(format!("items: {}", item_query.iter().count()));
     });
 }

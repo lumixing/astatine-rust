@@ -1,6 +1,6 @@
 use bevy::{prelude::*, math::vec3};
 
-use crate::{world::{position::ChunkPos, chunks::ReloadChunks, storage::WorldStorage, block::Block}, physics::{Velocity, Rigidbody}};
+use crate::{world::{position::ChunkPos, chunks::ReloadChunks, storage::WorldStorage, block::Block}, physics::{Velocity, Rigidbody}, entities::item::SpawnItem};
 
 use super::camera::CursorPosition;
 
@@ -71,8 +71,21 @@ pub fn mouse_input(
     mouse_input: Res<Input<MouseButton>>,
     mut world_storage: ResMut<WorldStorage>,
     mut reload_event: EventWriter<ReloadChunks>,
+    mut item_event: EventWriter<SpawnItem>,
 ) {
     if mouse_input.pressed(MouseButton::Left) {
+        let block = world_storage.get_block(cursor_pos.0).unwrap();
+
+        if block == Block::Air { return; };
+
+        item_event.send(SpawnItem {
+            // position: cursor_pos.0.as_vec2() * 8.0,
+            position: Vec2 {
+                x: (cursor_pos.0.x * 8) as f32,
+                y: (cursor_pos.0.y * 8 + 8) as f32
+            },
+            block, // hehe crash here!, fix l8r B)
+        });
         world_storage.set_block(cursor_pos.0, Block::Air);
         reload_event.send(ReloadChunks);
     } else if mouse_input.pressed(MouseButton::Right) {

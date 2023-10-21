@@ -32,6 +32,16 @@ impl WorldStorage {
         self.0.get_mut(&chunk_pos)
     }
 
+    pub fn get_block(&mut self, block_pos: IVec2) -> Option<Block> {
+        let chunk_pos = ChunkPos::from_block_pos(block_pos);
+        let Some(chunk_data) = self.get_mut_chunk_data(chunk_pos) else {
+            warn!("could not set block at {} since there is no chunk data at {}", block_pos, chunk_pos.0);
+            return None;
+        };
+        let block_rel_pos = ivec2(block_pos.x % CHUNK_SIZE, block_pos.y % CHUNK_SIZE);
+        chunk_data.get_block(block_rel_pos)
+    }
+
     pub fn set_block(&mut self, block_pos: IVec2, block: Block) {
         let chunk_pos = ChunkPos::from_block_pos(block_pos);
         let Some(chunk_data) = self.get_mut_chunk_data(chunk_pos) else {
