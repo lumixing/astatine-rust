@@ -1,6 +1,6 @@
 use bevy::{prelude::*, core_pipeline::clear_color::ClearColorConfig, math::vec3};
 
-use crate::{world::position::ChunkPos, physics::Velocity};
+use crate::{world::position::ChunkPos, physics::{Velocity, Rigidbody}};
 
 #[derive(Component)]
 pub struct Player;
@@ -27,13 +27,14 @@ pub fn spawn_player(mut commands: Commands) {
                 ..default()
             },
             transform: Transform {
-                translation: vec3(100.0, 7.0*32.0*8.0, 20.0),
+                translation: vec3(100.0, 8.0*32.0*8.0, 20.0),
                 scale: vec3(8.0, 16.0, 8.0),
                 ..default()
             },
             ..default()
         },
         Player,
+        Rigidbody,
         ChunkPos(IVec2::ZERO),
         Velocity(Vec2::ZERO)
     ));
@@ -41,22 +42,22 @@ pub fn spawn_player(mut commands: Commands) {
 
 pub fn movement(
     keyboard_input: Res<Input<KeyCode>>,
-    mut player_query: Query<&mut Transform, With<Player>>,
+    mut player_query: Query<&mut Velocity, With<Player>>,
 ) {
-    // translate camera
-    let mut transform = player_query.single_mut();
+    let mut velocity = player_query.single_mut();
 
+    velocity.0.x = 0.0;
     if keyboard_input.pressed(KeyCode::A) {
-        transform.translation.x -= 5.0;
+        velocity.0.x = -128.0;
     }
     if keyboard_input.pressed(KeyCode::D) {
-        transform.translation.x += 5.0;
+        velocity.0.x = 128.0;
     }
     if keyboard_input.pressed(KeyCode::W) {
-        transform.translation.y += 5.0;
+        velocity.0.y = 128.0;
     }
     if keyboard_input.pressed(KeyCode::S) {
-        transform.translation.y -= 5.0;
+        velocity.0.y = -128.0;
     }
 }
 
