@@ -22,6 +22,7 @@ pub fn spawn(mut commands: Commands) {
     ));
 }
 
+#[allow(dead_code)]
 pub fn stress(mut commands: Commands) {
     let mut rng = thread_rng();
     for _ in 0..500 {

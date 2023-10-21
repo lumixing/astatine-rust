@@ -44,7 +44,7 @@ impl WorldStorage {
 }
 
 pub struct ChunkData {
-    blocks: Vec<u32>,
+    blocks: Vec<Block>,
     flip: Vec<(bool, bool)>
 }
 
@@ -52,12 +52,12 @@ impl ChunkData {
     pub fn new() -> Self {
         let mut rng = rand::thread_rng();
         Self {
-            blocks: vec![0; (CHUNK_SIZE*CHUNK_SIZE) as usize],
+            blocks: vec![Block::Air; (CHUNK_SIZE*CHUNK_SIZE) as usize],
             flip: (0..CHUNK_SIZE*CHUNK_SIZE).map(|_| (rng.gen_bool(0.5), rng.gen_bool(0.5))).collect()
         }
     }
 
-    pub fn get_block(&self, block_pos: IVec2) -> Option<u32> {
+    pub fn get_block(&self, block_pos: IVec2) -> Option<Block> {
         // if !block_pos.is_relative_chunk_pos() { return None; };
         let lin = linearize(block_pos);
         Some(self.blocks[lin])
@@ -66,7 +66,7 @@ impl ChunkData {
     pub fn set_block(&mut self, block_pos: IVec2, block: Block) {
         // if !block_pos.is_relative_chunk_pos() { return None; };
         let lin = linearize(block_pos);
-        self.blocks[lin] = block as u32;
+        self.blocks[lin] = block;
     }
 
     pub fn get_flip(&self, block_pos: IVec2) -> Option<(bool, bool)> {

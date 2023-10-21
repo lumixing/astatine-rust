@@ -10,6 +10,7 @@ pub enum Block {
 }
 
 impl Block {
+    #[allow(dead_code)]
     pub fn from(block: u32) -> Self {
         match block {
             0 => Self::Air,

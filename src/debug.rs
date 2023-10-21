@@ -1,10 +1,9 @@
-use bevy::{prelude::*, math::{vec2, Vec3Swizzles}};
+use bevy::{prelude::*, math::vec2};
 use bevy_egui::{EguiContexts, egui};
 
 use crate::{physics::Velocity, player::player::Player, world::chunks::Colls};
 
 #[allow(dead_code)]
-
 pub fn chunk_borders(
     mut gizmos: Gizmos
 ) {
@@ -17,6 +16,7 @@ pub fn chunk_borders(
     }
 }
 
+#[allow(dead_code)]
 pub fn draw_colls(
     mut gizmos: Gizmos,
     colls: Res<Colls>
@@ -29,14 +29,15 @@ pub fn draw_colls(
 pub fn debug_text(
     mut contexts: EguiContexts,
     player_query: Query<(&Transform, &Velocity, &Player)>,
-    colls: Res<Colls>
+    colls: Res<Colls>,
+    time: Res<Time>
 ) {
     let (transform, velocity, _player) = player_query.single();
 
-    egui::Window::new("astatine debug shit").show(contexts.ctx_mut(), |ui| {
-        ui.label(format!("world position: {}", transform.translation.xy()));
+    egui::Window::new("debug").show(contexts.ctx_mut(), |ui| {
+        ui.label(format!("{}fps / {}ms", (1.0/time.delta_seconds()).floor(), (time.delta_seconds()*1000.0).floor()));
+        ui.label(format!("world position: {}", transform.translation.truncate().floor()));
         ui.label(format!("velocity: {}", velocity.0));
-        // ui.label(format!("grounded: {}", player.grounded));
         ui.label(format!("colls: {}", colls.0.iter().count()));
     });
 }

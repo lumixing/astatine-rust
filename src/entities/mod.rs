@@ -9,7 +9,7 @@ pub struct EntitiesPlugin;
 impl Plugin for EntitiesPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(GameState::InGame), (
-            boxy::stress,
+            boxy::spawn,
         ).chain());
 
         // app.add_systems(Update, (

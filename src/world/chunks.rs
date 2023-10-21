@@ -97,21 +97,21 @@ fn spawn_chunk(
         .with_children(|builder| {
             for y in 0..CHUNK_SIZE {
                 for x in 0..CHUNK_SIZE {
-                    let tile = chunk_data.get_block(ivec2(x, y)).unwrap();
-                    let (flip_x, flip_y) = if Block::from(tile).should_flip() {
+                    let block = chunk_data.get_block(ivec2(x, y)).unwrap();
+                    let (flip_x, flip_y) = if block.should_flip() {
                         chunk_data.get_flip(ivec2(x, y)).unwrap()
                     } else {
                         (false, false)
                     };
 
-                    if tile != 0 {
+                    if block != Block::Air {
                         colls.0.insert(ivec2(x + chunk_pos.0.x * CHUNK_SIZE, y + chunk_pos.0.y * CHUNK_SIZE));
                     }
                     
                     let tile_pos = TilePos { x: x as u32, y: y as u32 };
                     let tile_entity = builder.spawn(TileBundle {
                         position: tile_pos,
-                        texture_index: TileTextureIndex(tile as u32),
+                        texture_index: TileTextureIndex(block as u32),
                         tilemap_id: TilemapId(builder.parent_entity()),
                         flip: TileFlip {
                             x: flip_x,
