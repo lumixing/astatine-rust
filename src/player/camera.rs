@@ -44,3 +44,21 @@ pub fn update_cursor_position(
     let tile_cursor_pos = world_cursor_pos.as_ivec2().add(4).div(8); // change this if something breaks
     res_cursor_pos.0 = tile_cursor_pos;
 }
+
+
+pub fn zoom(
+    keyboard_input: Res<Input<KeyCode>>,
+    mut q: Query<&mut OrthographicProjection, With<PlayerCamera>>,
+) {
+    let mut proj = q.single_mut();
+
+    if keyboard_input.just_pressed(KeyCode::Minus) {
+        proj.scale += 0.1;
+    }
+    if keyboard_input.just_pressed(KeyCode::Equals) {
+        proj.scale -= 0.1;
+    }
+    if keyboard_input.just_pressed(KeyCode::Back) {
+        proj.scale = 0.5;
+    }
+}
