@@ -21,8 +21,13 @@ pub fn draw_colls(
     mut gizmos: Gizmos,
     colls: Res<Colls>
 ) {
-    for c in colls.0.iter() {
-        gizmos.rect_2d(c.as_vec2() * 8.0, 0.0, Vec2::splat(8.0), Color::GREEN);
+    for (pos, len) in colls.0.iter() {
+        let npos = Vec2 {
+            x: pos.x as f32 * 8.0 + *len as f32 * 4.0 - 4.0,
+            y: pos.y as f32 * 8.0,
+        };
+        gizmos.rect_2d(npos, 0.0, vec2(8.0 * *len as f32, 8.0), Color::GREEN);
+        // gizmos.rect_2d(pos.as_vec2() * 8.0, 0.0, vec2(8.0 * *len as f32, 8.0), Color::GREEN);
     }
 }
 

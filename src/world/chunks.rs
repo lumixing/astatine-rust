@@ -11,7 +11,7 @@ pub const BLOCK_SIZE: i32 = 8;
 pub const CHUNK_SIZE: i32 = 32;
 
 #[derive(Resource)]
-pub struct Colls(pub HashSet<IVec2>);
+pub struct Colls(pub HashSet<(IVec2, i32)>);
 
 #[derive(Resource, Default)]
 pub struct LoadedChunks(HashMap<ChunkPos, (Entity, Entity)>);
@@ -59,8 +59,9 @@ pub fn spawn_chunks_near_player(
             if !chunk_pos.in_bounds() { continue; };
             // let chunk_pos = ChunkPos::new(chunk_pos_raw.x as u32, chunk_pos_raw.y as u32);
             let chunk_data = world_storage.get_chunk_data(chunk_pos).unwrap(); // else this if error
-            let chunk_entity = spawn_chunk(&mut commands, tileset, chunk_pos, chunk_data, &mut colls).unwrap();
+            let chunk_entity = spawn_chunk(&mut commands, tileset, chunk_pos, chunk_data).unwrap();
             let wall_chunk_entity = spawn_wall_chunk(&mut commands, tileset, chunk_pos, chunk_data).unwrap();
+            add_colls(&mut colls, chunk_pos, chunk_data);
             loaded_chunks.add_chunk(chunk_pos, chunk_entity, wall_chunk_entity);
         }
     }
@@ -79,12 +80,54 @@ fn despawn_all_chunks(
     colls.0.clear();
 }
 
+fn add_colls(
+    colls: &mut ResMut<Colls>,
+    chunk_pos: ChunkPos,
+    chunk_data: &ChunkData,
+) {
+    if !chunk_pos.in_bounds() {
+        warn!("tried to add colls out of bounds! not spawning ({})", chunk_pos.0);
+        return;
+    };
+
+    for y in 0..CHUNK_SIZE {
+        let mut s = -1;
+        let mut i = 0;
+
+        // 1d greedy meshing for colls
+        for x in 0..CHUNK_SIZE {
+            let block = chunk_data.get_block(ivec2(x, y)).unwrap();
+
+            if block != Block::Air { // if solid
+                if s == -1 { // if no start, new start
+                    s = x;
+                }
+
+                i += 1; // increase current coll
+
+                if x == CHUNK_SIZE-1 { // if on last block, treat as air (end and add coll)
+                    let pos = ivec2(s+chunk_pos.0.x*32,y+chunk_pos.0.y*32);
+                    colls.0.insert((pos, i));
+                }
+            } else { // if air
+                if i == 0 { continue; }; // if no start ignore
+
+                // end and add coll
+                let pos = ivec2(s+chunk_pos.0.x*32,y+chunk_pos.0.y*32);
+                colls.0.insert((pos, i));
+                s = -1;
+                i = 0;
+            }
+        }
+    }
+}
+
+// maybe merge both spawn chunks?
 fn spawn_chunk(
     commands: &mut Commands,
     tileset: &Tileset,
     chunk_pos: ChunkPos,
     chunk_data: &ChunkData,
-    colls: &mut ResMut<Colls>
 ) -> Option<Entity> {
     if !chunk_pos.in_bounds() {
         warn!("tried to spawn chunk out of bounds! not spawning ({})", chunk_pos.0);
@@ -111,10 +154,6 @@ fn spawn_chunk(
                         (false, false)
                     };
 
-                    if block != Block::Air {
-                        colls.0.insert(ivec2(x + chunk_pos.0.x * CHUNK_SIZE, y + chunk_pos.0.y * CHUNK_SIZE));
-                    }
-                    
                     let tile_pos = TilePos { x: x as u32, y: y as u32 };
                     let tile_entity = builder.spawn(TileBundle {
                         position: tile_pos,
