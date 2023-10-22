@@ -25,6 +25,7 @@ fn fill_dirt(world: &mut WorldStorage) {
     for x in 0..WORLD_BLOCK_SIZE.x {
         for y in 0..WORLD_BLOCK_SIZE.y {
             world.set_block(ivec2(x, y), Block::Dirt);
+            world.set_wall(ivec2(x, y), Block::Dirt);
         }
     }
 }
@@ -38,9 +39,11 @@ fn carve_surface(
     for x in 0..WORLD_BLOCK_SIZE.x {
         let val = (fbm.get([x as f64 / SURFACE_LENGTH, 0.0, 0.0]) * SURFACE_HEIGHT + WORLD_BLOCK_SIZE.y as f64 - SURFACE_OFFSET) as i32;
         world.set_block(ivec2(x, val), Block::Grass);
+        world.set_wall(ivec2(x, val), Block::Dirt);
 
         for y in (val + 1)..WORLD_BLOCK_SIZE.y {
             world.set_block(ivec2(x, y), Block::Air);
+            world.set_wall(ivec2(x, y), Block::Air);
         }
     }
 }

@@ -34,7 +34,7 @@ impl WorldStorage {
 
     pub fn get_block(&mut self, block_pos: IVec2) -> Option<Block> {
         let chunk_pos = ChunkPos::from_block_pos(block_pos);
-        let Some(chunk_data) = self.get_mut_chunk_data(chunk_pos) else {
+        let Some(chunk_data) = self.get_chunk_data(chunk_pos) else {
             warn!("could not set block at {} since there is no chunk data at {}", block_pos, chunk_pos.0);
             return None;
         };
@@ -51,10 +51,32 @@ impl WorldStorage {
         let block_rel_pos = ivec2(block_pos.x % CHUNK_SIZE, block_pos.y % CHUNK_SIZE);
         chunk_data.set_block(block_rel_pos, block);
     }
+
+    #[allow(dead_code)]
+    pub fn get_wall(&mut self, block_pos: IVec2) -> Option<Block> {
+        let chunk_pos = ChunkPos::from_block_pos(block_pos);
+        let Some(chunk_data) = self.get_chunk_data(chunk_pos) else {
+            warn!("could not set wall at {} since there is no chunk data at {}", block_pos, chunk_pos.0);
+            return None;
+        };
+        let block_rel_pos = ivec2(block_pos.x % CHUNK_SIZE, block_pos.y % CHUNK_SIZE);
+        chunk_data.get_wall(block_rel_pos)
+    }
+
+    pub fn set_wall(&mut self, block_pos: IVec2, block: Block) {
+        let chunk_pos = ChunkPos::from_block_pos(block_pos);
+        let Some(chunk_data) = self.get_mut_chunk_data(chunk_pos) else {
+            warn!("could not set wall at {} since there is no chunk data at {}", block_pos, chunk_pos.0);
+            return;
+        };
+        let block_rel_pos = ivec2(block_pos.x % CHUNK_SIZE, block_pos.y % CHUNK_SIZE);
+        chunk_data.set_wall(block_rel_pos, block);
+    }
 }
 
 pub struct ChunkData {
     blocks: Vec<Block>,
+    walls: Vec<Block>,
     flip: Vec<(bool, bool)>
 }
 
@@ -63,20 +85,29 @@ impl ChunkData {
         let mut rng = rand::thread_rng();
         Self {
             blocks: vec![Block::Air; (CHUNK_SIZE*CHUNK_SIZE) as usize],
+            walls: vec![Block::Dirt; (CHUNK_SIZE*CHUNK_SIZE) as usize],
             flip: (0..CHUNK_SIZE*CHUNK_SIZE).map(|_| (rng.gen_bool(0.5), rng.gen_bool(0.5))).collect()
         }
     }
 
     pub fn get_block(&self, block_pos: IVec2) -> Option<Block> {
-        // if !block_pos.is_relative_chunk_pos() { return None; };
         let lin = linearize(block_pos);
         Some(self.blocks[lin])
     }
 
+    pub fn get_wall(&self, block_pos: IVec2) -> Option<Block> {
+        let lin = linearize(block_pos);
+        Some(self.walls[lin])
+    }
+
     pub fn set_block(&mut self, block_pos: IVec2, block: Block) {
-        // if !block_pos.is_relative_chunk_pos() { return None; };
         let lin = linearize(block_pos);
         self.blocks[lin] = block;
+    }
+
+    pub fn set_wall(&mut self, block_pos: IVec2, block: Block) {
+        let lin = linearize(block_pos);
+        self.walls[lin] = block;
     }
 
     pub fn get_flip(&self, block_pos: IVec2) -> Option<(bool, bool)> {
