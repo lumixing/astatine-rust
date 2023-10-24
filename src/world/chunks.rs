@@ -80,6 +80,7 @@ fn despawn_all_chunks(
     colls.0.clear();
 }
 
+// haha is this branched?
 fn add_colls(
     colls: &mut ResMut<Colls>,
     chunk_pos: ChunkPos,
