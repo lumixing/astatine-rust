@@ -20,7 +20,7 @@ impl Plugin for PhysicsPlugin {
     //     ).chain());
 
         app.add_systems(Update, (
-            apply_gravity,
+            // apply_gravity,
             check_collision,
             apply_velocity,
         ).run_if(in_state(GameState::InGame)).chain());

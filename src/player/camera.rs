@@ -12,7 +12,7 @@ pub struct CursorPosition(pub IVec2);
 
 pub fn spawn_camera(mut commands: Commands) {
     let mut camera_bundle = Camera2dBundle::default();
-    camera_bundle.projection.scale = 0.5;
+    camera_bundle.projection.scale = 2.0;
     camera_bundle.camera_2d.clear_color = ClearColorConfig::Custom(Color::rgb(71./255., 209./255., 1.));
 
     commands.spawn((
@@ -52,13 +52,13 @@ pub fn zoom(
 ) {
     let mut proj = q.single_mut();
 
-    if keyboard_input.just_pressed(KeyCode::Minus) {
+    if keyboard_input.pressed(KeyCode::Minus) {
         proj.scale += 0.1;
     }
-    if keyboard_input.just_pressed(KeyCode::Equals) {
+    if keyboard_input.pressed(KeyCode::Equals) {
         proj.scale -= 0.1;
     }
-    if keyboard_input.just_pressed(KeyCode::Back) {
+    if keyboard_input.pressed(KeyCode::Back) {
         proj.scale = 0.5;
     }
 }

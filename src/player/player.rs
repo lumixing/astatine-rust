@@ -15,7 +15,8 @@ pub fn spawn_player(mut commands: Commands) {
                 ..default()
             },
             transform: Transform {
-                translation: vec3(100.0, 8.0*32.0*8.0, 20.0),
+                translation: vec3(3000.0, 3800.0, 20.0),
+                // translation: vec3(100.0, 8.0*32.0*8.0, 20.0),
                 scale: vec3(8.0, 16.0, 8.0),
                 ..default()
             },
@@ -35,6 +36,7 @@ pub fn movement(
     let mut velocity = player_query.single_mut();
 
     velocity.0.x = 0.0;
+    velocity.0.y = 0.0;
     if keyboard_input.pressed(KeyCode::A) {
         velocity.0.x = -128.0;
     }
