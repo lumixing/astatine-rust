@@ -93,7 +93,7 @@ pub fn check_collision(
             if let Some(c) = coll {
                 velocity.0.x = 0.0;
                 if c == Collision::Right {
-                    // transform.translation.x = (coll_transform.x as f32 * 8.0) + 4.0;
+                    transform.translation.x = (coll_transform.x as f32 * 8.0) + (*coll_length * 8) as f32;
                 } else if c == Collision::Left {
                     transform.translation.x = (coll_transform.x as f32 * 8.0) - 8.0;
                 }
