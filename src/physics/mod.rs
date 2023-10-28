@@ -21,7 +21,7 @@ impl Plugin for PhysicsPlugin {
 
         app.add_systems(Update, (
             // apply_gravity,
-            check_collision,
+            // check_collision,
             apply_velocity,
         ).run_if(in_state(GameState::InGame)).chain());
     }
@@ -47,6 +47,7 @@ fn apply_velocity(
     }
 }
 
+/*
 pub fn check_collision(
     mut q: Query<(&mut Transform, &mut Velocity, Entity)>,
     // mut player_queue: Query<&mut Player>,
@@ -104,4 +105,4 @@ pub fn check_collision(
             // player_queue.get_mut(entity).unwrap().grounded = should_ground;
         // }
     }
-}
+} */

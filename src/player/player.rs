@@ -15,7 +15,8 @@ pub fn spawn_player(mut commands: Commands) {
                 ..default()
             },
             transform: Transform {
-                translation: vec3(3000.0, 3800.0, 20.0),
+                translation: vec3(32.0, 32.0, 20.0),
+                // translation: vec3(3000.0, 3800.0, 20.0),
                 // translation: vec3(100.0, 8.0*32.0*8.0, 20.0),
                 scale: vec3(8.0, 16.0, 8.0),
                 ..default()
@@ -49,6 +50,12 @@ pub fn movement(
     if keyboard_input.pressed(KeyCode::S) {
         velocity.0.y = -128.0;
     }
+}
+
+pub fn reload_chunks(
+    mut reload_event: EventWriter<ReloadChunks>
+) {
+    reload_event.send(ReloadChunks);
 }
 
 pub fn update_positions(

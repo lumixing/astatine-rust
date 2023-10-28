@@ -16,6 +16,7 @@ impl Plugin for PlayerPlugin {
         app.add_systems(OnEnter(GameState::InGame), (
             camera::spawn_camera,
             player::spawn_player,
+            player::reload_chunks,
         ).chain());
 
         app.add_systems(Update, (

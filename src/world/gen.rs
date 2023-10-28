@@ -23,9 +23,9 @@ pub fn generate(mut commands: Commands) {
     let mut rng = thread_rng();
 
     fill_dirt(&mut world);
-    carve_surface(&mut world, &mut rng);
-    fill_stone(&mut world, &mut rng);
-    carve_caves(&mut world, &mut rng);
+    // carve_surface(&mut world, &mut rng);
+    // fill_stone(&mut world, &mut rng);
+    // carve_caves(&mut world, &mut rng);
 
     commands.insert_resource(world);
     commands.insert_resource(NextState(Some(GameState::InGame)));

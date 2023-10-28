@@ -15,8 +15,8 @@ impl Plugin for EntitiesPlugin {
         //     boxy::spawn,
         // ).chain());
 
-        app.add_systems(Update, (
-            item::spawn
-        ).run_if(in_state(GameState::InGame)).chain());
+        // app.add_systems(Update, (
+        //     item::spawn
+        // ).run_if(in_state(GameState::InGame)).chain());
     }
 }
