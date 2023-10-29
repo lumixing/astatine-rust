@@ -129,7 +129,7 @@ fn add_colls(
                     }
                 }
 
-                colls.0.insert((IVec2 { x, y }, size));
+                colls.0.insert((IVec2 { x: x + chunk_pos.0.x * 32, y: y + chunk_pos.0.y * 32 }, size));
             }
         }
     }
