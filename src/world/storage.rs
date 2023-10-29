@@ -3,7 +3,7 @@ use rand::prelude::*;
 
 use super::{position::{ChunkPos, linearize}, block::Block, chunks::CHUNK_SIZE};
 
-pub const WORLD_CHUNK_SIZE: IVec2 = ivec2(16, 8);
+pub const WORLD_CHUNK_SIZE: IVec2 = ivec2(32, 16);
 pub const WORLD_BLOCK_SIZE: IVec2 = IVec2 {
     x: WORLD_CHUNK_SIZE.x * CHUNK_SIZE,
     y: WORLD_CHUNK_SIZE.y * CHUNK_SIZE
