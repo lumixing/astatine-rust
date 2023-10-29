@@ -26,7 +26,9 @@ pub fn draw_colls(
             x: pos.x as f32 * 8.0 + size.x as f32 * 4.0 - 4.0,
             y: pos.y as f32 * 8.0 + size.y as f32 * 4.0 - 4.0,
         };
-        gizmos.rect_2d(npos, 0.0, vec2(8.0 * size.x as f32, 8.0 * size.y as f32), Color::GREEN);
+        let size = vec2(8.0 * size.x as f32, 8.0 * size.y as f32);
+        gizmos.rect_2d(npos, 0.0, size - 2.0, Color::GREEN);
+        // gizmos.line_2d(npos - vec2(size.x / 2.0, 4.0), npos + size - vec2(size.x / 2.0, 0.0), Color::GREEN)
         // gizmos.rect_2d(pos.as_vec2() * 8.0, 0.0, vec2(8.0 * *len as f32, 8.0), Color::GREEN);
     }
 }

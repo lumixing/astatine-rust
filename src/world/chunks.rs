@@ -91,92 +91,47 @@ fn add_colls(
         return;
     };
 
-    let mut expanded: HashSet<IVec2> = HashSet::new();
-    for y in 0..CHUNK_SIZE {
-        let mut s = -1;
-        let mut i = 0;
+    let mut visited = vec![vec![false; 32]; 32];
 
-        // 1d greedy meshing for colls
-        for x in 0..CHUNK_SIZE {
+    for y in 0..32 {
+        for x in 0..32 {
             let block = chunk_data.get_block(ivec2(x, y)).unwrap();
+            if block != Block::Air && !visited[y as usize][x as usize] {
+                let mut size = IVec2 { x: 1, y: 1 };
+                visited[y as usize][x as usize] = true;
 
-            if block != Block::Air { // if solid
-                // if from expanded coll, continue
-                if expanded.contains(&ivec2(x, y)) {
-                    info!("{x},{y} is already expanded!");
-                    if s != -1 { // if theres a start then end it
-                        end(&mut s, y, chunk_pos, &mut i, colls, chunk_data, &mut expanded);
+                // Expand solid block horizontally
+                for xx in (x + 1)..32 {
+                    let nblock = chunk_data.get_block(ivec2(xx, y)).unwrap();
+                    if nblock != Block::Air && !visited[y as usize][xx as usize] {
+                        size.x += 1;
+                        for i in x..xx + 1 {
+                            visited[y as usize][i as usize] = true;
+                        }
+                    } else {
+                        break;
                     }
-                    continue;
-                }; 
-
-                if s == -1 { // if no start, new start
-                    s = x;
                 }
 
-                i += 1; // increase current coll
-                info!("{x},{y} increasing size!1d");
-
-                if x == CHUNK_SIZE-1 { // if on last block, treat as air (end and add coll)
-                    /*
-                    let pos = ivec2(s+chunk_pos.0.x*32,y+chunk_pos.0.y*32);
-                    let size = ivec2(i, 1);
-                    colls.0.insert((pos, size));
-                    */
-                    info!("{x},{y} ended, end of chunk!1d");
-                    end(&mut s, y, chunk_pos, &mut i, colls, chunk_data, &mut expanded);
+                // Expand solid block vertically
+                'outer: for yy in (y + 1)..32 {
+                    for xx in x..(x + size.x) {
+                        let nblock = chunk_data.get_block(ivec2(xx, yy)).unwrap();
+                        if nblock == Block::Air {
+                            break 'outer;
+                        }
+                    }
+                    size.y += 1;
+                    for xx in x..(x + size.x) {
+                        for i in y..yy + 1 {
+                            visited[i as usize][xx as usize] = true;
+                        }
+                    }
                 }
-            } else { // if air
-                if i == 0 {
-                    info!("{x},{y} ignoring, no start!");
-                    continue;
-                }; // if no start ignore
 
-                // end and add coll
-                /*
-                let pos = ivec2(s+chunk_pos.0.x*32,y+chunk_pos.0.y*32);
-                let size = ivec2(i, 1);
-                colls.0.insert((pos, size));
-                s = -1;
-                i = 0;
-                */
-                info!("{x},{y} ended, air!");
-                end(&mut s, y, chunk_pos, &mut i, colls, chunk_data, &mut expanded);
+                colls.0.insert((IVec2 { x, y }, size));
             }
         }
-    }
-
-    fn end(s: &mut i32, y: i32, chunk_pos: ChunkPos, i: &mut i32,colls: &mut ResMut<'_, Colls>, chunk_data: &ChunkData, expanded: &mut HashSet<IVec2>) {
-        // end 1d coll
-        let pos = ivec2(*s+chunk_pos.0.x*32,y+chunk_pos.0.y*32);
-        let mut size = ivec2(*i, 1);
-        // colls.0.insert((pos, size));
-        // *s = -1;
-        // *i = 0;
-
-        // check if can expand
-        if y == CHUNK_SIZE-1 {
-            info!("cant expand, end of chunK!");
-            return;
-        }; // cant expand, end of chunk
-        for x in *s..(*s+*i) {
-            let cpos = ivec2(x, y+1);
-            // info!("current pos: {cpos}");
-            let block = chunk_data.get_block(cpos).unwrap();
-            if block == Block::Air { // cant expand :(
-                colls.0.insert((pos, size));
-                *s = -1;
-                *i = 0;
-                info!("cant expand!");
-                return;
-            }
-            // info!("added {cpos} to expanded");
-            expanded.insert(cpos);
-        }
-        info!("expanding!");
-        // can expand!
-        size.y += 1;
-        colls.0.insert((pos, size));
     }
 }
 

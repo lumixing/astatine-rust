@@ -83,8 +83,7 @@ pub fn mouse_input(
     mut item_event: EventWriter<SpawnItem>,
 ) {
     if mouse_input.pressed(MouseButton::Left) {
-        let block = world_storage.get_block(cursor_pos.0).unwrap();
-
+        let Some(block) = world_storage.get_block(cursor_pos.0) else { return; };
         if block == Block::Air { return; };
 
         item_event.send(SpawnItem {
@@ -98,6 +97,9 @@ pub fn mouse_input(
         world_storage.set_block(cursor_pos.0, Block::Air);
         reload_event.send(ReloadChunks);
     } else if mouse_input.pressed(MouseButton::Right) {
+        let Some(block) = world_storage.get_block(cursor_pos.0) else { return; };
+        if block != Block::Air { return; };
+
         world_storage.set_block(cursor_pos.0, Block::Dirt);
         reload_event.send(ReloadChunks);
     }
