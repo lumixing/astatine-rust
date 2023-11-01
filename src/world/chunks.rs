@@ -20,7 +20,7 @@ pub const BLOCK_SIZE_F: f32 = 8.0;
 pub const HALF_BLOCK_SIZE: i32 = 4;
 pub const HALF_BLOCK_SIZE_F: f32 = 8.0;
 pub const CHUNK_SIZE: i32 = 32;
-pub const CHUNK_SIZE_F: f32 = 32.0;
+// pub const CHUNK_SIZE_F: f32 = 32.0;
 
 #[derive(Resource)]
 pub struct Colls(pub HashSet<(IVec2, i32)>);
