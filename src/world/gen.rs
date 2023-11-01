@@ -1,10 +1,13 @@
-use bevy::{prelude::*, math::ivec2};
-use noise::{Fbm, Perlin, NoiseFn};
+use bevy::{math::ivec2, prelude::*};
+use noise::{Fbm, NoiseFn, Perlin};
 use rand::prelude::*;
 
 use crate::states::GameState;
 
-use super::{storage::{WorldStorage, WORLD_BLOCK_SIZE}, block::Block};
+use super::{
+    block::Block,
+    storage::{WorldStorage, WORLD_BLOCK_SIZE},
+};
 
 const SURFACE_LENGTH: f64 = 48.0;
 const SURFACE_HEIGHT: f64 = 12.0;
@@ -40,10 +43,7 @@ fn fill_dirt(world: &mut WorldStorage) {
     }
 }
 
-fn carve_surface(
-    world: &mut WorldStorage,
-    rng: &mut ThreadRng
-) {
+fn carve_surface(world: &mut WorldStorage, rng: &mut ThreadRng) {
     let fbm = Fbm::<Perlin>::new(rng.gen());
 
     for x in 0..WORLD_BLOCK_SIZE.x {
@@ -58,10 +58,7 @@ fn carve_surface(
     }
 }
 
-fn fill_stone(
-    world: &mut WorldStorage,
-    rng: &mut ThreadRng,
-) {
+fn fill_stone(world: &mut WorldStorage, rng: &mut ThreadRng) {
     for x in 0..WORLD_BLOCK_SIZE.x {
         let val = ((x as f32 * STONE_LENGTH).sin() * STONE_HEIGHT + WORLD_BLOCK_SIZE.y as f32 - STONE_OFFSET) as usize;
 
@@ -72,21 +69,24 @@ fn fill_stone(
                 continue;
             }
 
-            let block = if rng.gen_bool(0.5) { Block::Dirt } else { Block::Stone };
+            let block = if rng.gen_bool(0.5) {
+                Block::Dirt
+            } else {
+                Block::Stone
+            };
             world.set_block(ivec2(x, y as i32), block);
         }
     }
 }
 
-fn carve_caves(
-    world: &mut WorldStorage,
-    rng: &mut ThreadRng,
-) {
+fn carve_caves(world: &mut WorldStorage, rng: &mut ThreadRng) {
     let fbm = Fbm::<Perlin>::new(rng.gen());
 
     for y in 0..WORLD_BLOCK_SIZE.y {
         for x in 0..WORLD_BLOCK_SIZE.x {
-            if world.get_block(ivec2(x, y)).unwrap() != Block::Stone { continue; }
+            if world.get_block(ivec2(x, y)).unwrap() != Block::Stone {
+                continue;
+            }
 
             let val = fbm.get([x as f64 / CAVES_SCALE, y as f64 / CAVES_SCALE, 0.0]);
             if val < CAVES_TRESHOLD {

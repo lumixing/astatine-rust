@@ -1,8 +1,9 @@
-use bevy::{prelude::*, math::vec3};
+use bevy::{math::vec3, prelude::*};
 use rand::prelude::*;
 
 use crate::physics::{Rigidbody, Velocity};
 
+#[allow(dead_code)]
 pub fn spawn(mut commands: Commands) {
     commands.spawn((
         SpriteBundle {
@@ -11,14 +12,14 @@ pub fn spawn(mut commands: Commands) {
                 ..default()
             },
             transform: Transform {
-                translation: vec3(150.0, 7.0*32.0*8.0+100.0, 20.0),
+                translation: vec3(150.0, 7.0 * 32.0 * 8.0 + 100.0, 20.0),
                 scale: vec3(8.0, 8.0, 8.0),
                 ..default()
             },
             ..default()
         },
         Rigidbody,
-        Velocity(Vec2::ZERO)
+        Velocity(Vec2::ZERO),
     ));
 }
 
@@ -35,14 +36,14 @@ pub fn stress(mut commands: Commands) {
                     ..default()
                 },
                 transform: Transform {
-                    translation: vec3(x, 7.0*32.0*8.0+y, 20.0),
+                    translation: vec3(x, 7.0 * 32.0 * 8.0 + y, 20.0),
                     scale: vec3(8.0, 8.0, 8.0),
                     ..default()
                 },
                 ..default()
             },
             Rigidbody,
-            Velocity(Vec2::ZERO)
+            Velocity(Vec2::ZERO),
         ));
     }
 }

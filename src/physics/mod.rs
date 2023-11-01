@@ -1,8 +1,13 @@
-use bevy::{prelude::*, sprite::collide_aabb::{collide, Collision}, math::{vec3, vec2}};
+use bevy::{
+    math::{vec2, vec3},
+    prelude::*,
+    sprite::collide_aabb::{collide, Collision},
+};
 
-use crate::{states::GameState, world::chunks::Colls};
-
-// pub mod player;
+use crate::{
+    states::GameState,
+    world::chunks::{Colls, BLOCK_SIZE, BLOCK_SIZE_F, HALF_BLOCK_SIZE_F},
+};
 
 pub struct PhysicsPlugin;
 
@@ -14,22 +19,16 @@ pub struct Rigidbody;
 
 impl Plugin for PhysicsPlugin {
     fn build(&self, app: &mut App) {
-    //     app.add_systems(OnEnter(GameState::InGame), (
-    //         player::spawn_camera,
-    //         player::spawn_player,
-    //     ).chain());
-
-        app.add_systems(Update, (
-            // apply_gravity,
-            check_collision,
-            apply_velocity,
-        ).run_if(in_state(GameState::InGame)).chain());
+        app.add_systems(
+            Update,
+            (apply_gravity, check_collision, apply_velocity)
+                .run_if(in_state(GameState::InGame))
+                .chain(),
+        );
     }
 }
 
-pub fn apply_gravity(
-    mut q: Query<&mut Velocity, With<Rigidbody>>
-) {
+fn apply_gravity(mut q: Query<&mut Velocity, With<Rigidbody>>) {
     for mut velocity in q.iter_mut() {
         velocity.0.y += -10.0;
         velocity.0.x = velocity.0.x.clamp(-512.0, 512.0);
@@ -38,70 +37,61 @@ pub fn apply_gravity(
 }
 
 fn apply_velocity(
-    mut q: Query<(&mut Transform, &Velocity), With<Rigidbody>>,
-    time: Res<Time>
-) {
+    mut q: Query<(&mut Transform, &Velocity),With<Rigidbody>>,
+    time: Res<Time>) {
     let delta = time.delta_seconds();
     for (mut transform, velocity) in q.iter_mut() {
         transform.translation += velocity.0.extend(0.0) * delta;
     }
 }
 
-pub fn check_collision(
+fn check_collision(
     mut q: Query<(&mut Transform, &mut Velocity, Entity)>,
-    // mut player_queue: Query<&mut Player>,
     colls: Res<Colls>,
-    time: Res<Time>
+    time: Res<Time>,
 ) {
     let delta = time.delta_seconds();
     for (mut transform, mut velocity, _entity) in q.iter_mut() {
-        // let mut should_ground = false;
-
         for (coll_transform, coll_length) in colls.0.iter() {
             // vertical collision
             let coll_pos = Vec3 {
-                x: coll_transform.x as f32 * 8.0 + *coll_length as f32 * 4.0 - 4.0,
-                y: coll_transform.y as f32 * 8.0,
-                z: 0.0 
+                x: coll_transform.x as f32 * BLOCK_SIZE_F + *coll_length as f32 * HALF_BLOCK_SIZE_F - HALF_BLOCK_SIZE_F,
+                y: coll_transform.y as f32 * BLOCK_SIZE_F,
+                z: 0.0,
             };
             let vertical_translation = transform.translation + vec3(0.0, velocity.0.y * delta, 0.0);
             let coll = collide(
                 vertical_translation,
                 transform.scale.truncate(),
-                // (coll_transform.as_vec2().extend(0.0) * 8.0) + *coll_length as f32 * 4.0,
                 coll_pos,
-                vec2(8.0 * *coll_length as f32, 8.0),
+                vec2(BLOCK_SIZE_F * *coll_length as f32, BLOCK_SIZE_F),
             );
 
             if let Some(c) = coll {
                 velocity.0.y = 0.0;
-                if c == Collision::Top {
-                    transform.translation.y = (coll_transform.y as f32 * 8.0) + (transform.scale.y / 2.0 + 4.0);
-                    // should_ground = true;
+                if c == Collision::Top || c == Collision::Inside {
+                    transform.translation.y = (coll_transform.y as f32 * BLOCK_SIZE_F) + (transform.scale.y / 2.0 + HALF_BLOCK_SIZE_F);
                 }
             }
 
             // horizontal collision
-            let horizontal_translation = transform.translation + vec3(velocity.0.x * delta, 0.0, 0.0);
+            let horizontal_translation =
+                transform.translation + vec3(velocity.0.x * delta, 0.0, 0.0);
             let coll = collide(
                 horizontal_translation,
                 transform.scale.truncate(),
                 coll_pos,
-                vec2(8.0 * *coll_length as f32, 8.0),
+                vec2(BLOCK_SIZE_F * *coll_length as f32, BLOCK_SIZE_F),
             );
 
             if let Some(c) = coll {
                 velocity.0.x = 0.0;
                 if c == Collision::Right {
-                    transform.translation.x = (coll_transform.x as f32 * 8.0) + (*coll_length * 8) as f32;
+                    transform.translation.x = (coll_transform.x as f32 * BLOCK_SIZE_F) + (*coll_length * BLOCK_SIZE) as f32;
                 } else if c == Collision::Left {
-                    transform.translation.x = (coll_transform.x as f32 * 8.0) - 8.0;
+                    transform.translation.x = (coll_transform.x as f32 * BLOCK_SIZE_F) - BLOCK_SIZE_F;
                 }
             }
         }
-
-        // if player_queue.contains(entity) {
-            // player_queue.get_mut(entity).unwrap().grounded = should_ground;
-        // }
     }
 }

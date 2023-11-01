@@ -5,13 +5,16 @@ use bevy_tileset::prelude::Tileset;
 
 use crate::states::GameState;
 
-use self::{gen::generate, chunks::{Colls, ReloadChunks}};
+use self::{
+    chunks::{Colls, ReloadChunks},
+    gen::generate,
+};
 
-pub(crate) mod position;
-pub(crate) mod storage;
+pub(crate) mod block;
 pub(crate) mod chunks;
 mod gen;
-pub(crate) mod block;
+pub(crate) mod position;
+pub(crate) mod storage;
 
 #[allow(dead_code)]
 #[derive(AssetCollection, Resource)]
@@ -29,18 +32,19 @@ impl Plugin for WorldPlugin {
         app.add_plugins((
             bevy_ecs_tilemap::TilemapPlugin,
             bevy_tileset::prelude::TilesetPlugin::default(),
-            EguiPlugin
+            EguiPlugin,
         ));
 
         app.add_collection_to_loading_state::<_, TileTextures>(GameState::AssetLoading);
-        app.init_resource::<chunks::LoadedChunks>(); 
+        app.init_resource::<chunks::LoadedChunks>();
         app.insert_resource(Colls(HashSet::new()));
         app.add_event::<ReloadChunks>();
 
         app.add_systems(OnEnter(GameState::WorldGeneration), generate);
 
-        app.add_systems(Update, (
-            chunks::spawn_chunks_near_player,
-        ).run_if(in_state(GameState::InGame)));
+        app.add_systems(
+            Update,
+            (chunks::spawn_chunks_near_player,).run_if(in_state(GameState::InGame)),
+        );
     }
 }
