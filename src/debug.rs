@@ -1,7 +1,7 @@
 use bevy::{prelude::*, math::vec2};
 use bevy_egui::{EguiContexts, egui};
 
-use crate::{physics::Velocity, player::{player::Player, camera::CursorPosition}, world::chunks::Colls, entities::item::Item};
+use crate::{physics::Velocity, player::{player::Player, camera::CursorPosition}, world::chunks::{Colls, BLOCK_SIZE_F, HALF_BLOCK_SIZE_F}, entities::item::Item};
 
 #[allow(dead_code)]
 pub fn chunk_borders(
@@ -23,10 +23,10 @@ pub fn draw_colls(
 ) {
     for (pos, len) in colls.0.iter() {
         let npos = Vec2 {
-            x: pos.x as f32 * 8.0 + *len as f32 * 4.0 - 4.0,
-            y: pos.y as f32 * 8.0,
+            x: pos.x as f32 * BLOCK_SIZE_F + *len as f32 * HALF_BLOCK_SIZE_F - HALF_BLOCK_SIZE_F,
+            y: pos.y as f32 * BLOCK_SIZE_F,
         };
-        gizmos.rect_2d(npos, 0.0, vec2(8.0 * *len as f32, 8.0), Color::GREEN);
+        gizmos.rect_2d(npos, 0.0, vec2(BLOCK_SIZE_F * *len as f32, BLOCK_SIZE_F), Color::GREEN);
         // gizmos.rect_2d(pos.as_vec2() * 8.0, 0.0, vec2(8.0 * *len as f32, 8.0), Color::GREEN);
     }
 }

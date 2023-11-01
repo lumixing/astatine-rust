@@ -44,10 +44,7 @@ impl LoadedChunks {
         wall_chunk_entity: Entity,
     ) {
         if !chunk_pos.in_bounds() {
-            warn!(
-                "could not load chunk that is out of bounds: {}",
-                chunk_pos.0
-            );
+            warn!("could not load chunk that is out of bounds: {}", chunk_pos.0);
             return;
         }
         self.0.insert(chunk_pos, (chunk_entity, wall_chunk_entity));
