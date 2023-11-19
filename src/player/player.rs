@@ -1,10 +1,6 @@
-use bevy::{math::vec3, prelude::*};
+use bevy::{prelude::*, math::vec3};
 
-use crate::{
-    entities::item::SpawnItem,
-    physics::{Rigidbody, Velocity},
-    world::{block::Block, chunks::{ReloadChunks, BLOCK_SIZE_F}, position::ChunkPos, storage::WorldStorage},
-};
+use crate::{world::{position::ChunkPos, chunks::ReloadChunks, storage::WorldStorage, block::Block}, physics::{Velocity, Rigidbody}, entities::item::SpawnItem};
 
 use super::camera::CursorPosition;
 
@@ -29,7 +25,7 @@ pub fn spawn_player(mut commands: Commands) {
         Player,
         Rigidbody,
         ChunkPos(IVec2::ZERO),
-        Velocity(Vec2::ZERO),
+        Velocity(Vec2::ZERO)
     ));
 }
 
@@ -55,15 +51,14 @@ pub fn movement(
     }
 }
 
-// update chunk position if needed and reload chunks
 pub fn update_positions(
     mut player_query: Query<(&Transform, &mut ChunkPos), With<Player>>,
     mut reload_event: EventWriter<ReloadChunks>,
 ) {
     let (transform, mut chunk_pos) = player_query.single_mut();
     let translation = IVec2 {
-        x: (transform.translation.x / BLOCK_SIZE_F) as i32,
-        y: (transform.translation.y / BLOCK_SIZE_F) as i32,
+        x: (transform.translation.x / 8.0) as i32,
+        y: (transform.translation.y / 8.0) as i32
     };
 
     let new_chunk_pos = ChunkPos::from_block_pos(translation);
@@ -80,24 +75,22 @@ pub fn mouse_input(
     mut reload_event: EventWriter<ReloadChunks>,
     mut item_event: EventWriter<SpawnItem>,
 ) {
-    // break block
     if mouse_input.pressed(MouseButton::Left) {
-        let Some(block) = world_storage.get_block(cursor_pos.0) else { return; };
+        let block = world_storage.get_block(cursor_pos.0).unwrap();
+
         if block == Block::Air { return; };
 
         item_event.send(SpawnItem {
-            position: cursor_pos.0.as_vec2() * BLOCK_SIZE_F,
-            block, // hehe crash here!, fix l8r B) (note to past: pls be more specific wtf is this)
+            // position: cursor_pos.0.as_vec2() * 8.0,
+            position: Vec2 {
+                x: (cursor_pos.0.x * 8) as f32,
+                y: (cursor_pos.0.y * 8 + 8) as f32
+            },
+            block, // hehe crash here!, fix l8r B)
         });
-
         world_storage.set_block(cursor_pos.0, Block::Air);
         reload_event.send(ReloadChunks);
-    }
-    // place block
-    else if mouse_input.pressed(MouseButton::Right) {
-        let Some(block) = world_storage.get_block(cursor_pos.0) else { return; };
-        if block != Block::Air { return; };
-
+    } else if mouse_input.pressed(MouseButton::Right) {
         world_storage.set_block(cursor_pos.0, Block::Dirt);
         reload_event.send(ReloadChunks);
     }
