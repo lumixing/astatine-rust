@@ -1,8 +1,12 @@
 # astatine
-2D sandbox game written in rust
+> 2D sandbox game written in rust
+
+still in like pre-pre-pre-alpha  
+updating whenever :)
 
 # screenshots
-i forgor
+![surface](assets/screenshots/surface.png)
+![caves](assets/screenshots/caves.png)
 
 # features
 - cool chunk manager which manages the world using 32x32 block chunks
