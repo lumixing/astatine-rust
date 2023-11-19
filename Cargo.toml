@@ -17,5 +17,6 @@ bevy_tileset = "0.8.0"
 noise = "0.8.2"
 rand = "0.8.5"
 
-[profile.release]
-debug = true
+# Enable max optimizations for dependencies, but not for our code:
+[profile.dev.package."*"]
+opt-level = 3

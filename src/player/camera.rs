@@ -12,7 +12,7 @@ pub struct CursorPosition(pub IVec2);
 
 pub fn spawn_camera(mut commands: Commands) {
     let mut camera_bundle = Camera2dBundle::default();
-    camera_bundle.projection.scale = 2.0;
+    camera_bundle.projection.scale = 0.5;
     camera_bundle.camera_2d.clear_color = ClearColorConfig::Custom(Color::rgb(71./255., 209./255., 1.));
 
     commands.spawn((

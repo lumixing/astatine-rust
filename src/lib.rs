@@ -19,7 +19,7 @@ pub fn app() -> App {
         DefaultPlugins
             .set(WindowPlugin {
                 primary_window: Some(Window {
-                    present_mode: bevy::window::PresentMode::AutoVsync,
+                    present_mode: bevy::window::PresentMode::Immediate,
                     mode: bevy::window::WindowMode::Windowed,
                     title: format!("astatine.rs"),
                     ..default()

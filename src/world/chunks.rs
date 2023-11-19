@@ -52,8 +52,8 @@ pub fn spawn_chunks_near_player(
     let Ok(player_chunk_pos) = player_query.get_single() else { return };
 
     despawn_all_chunks(&mut commands, &mut loaded_chunks, &mut colls);
-    for y in -4..=4 { //1
-        for x in -4..=4 { //2
+    for y in -1..=1 { //1 / 4
+        for x in -2..=2 { //2 / 4
             let chunk_pos_raw = ivec2(x + player_chunk_pos.0.x as i32, y + player_chunk_pos.0.y as i32);
             let chunk_pos = ChunkPos(chunk_pos_raw);
             if !chunk_pos.in_bounds() { continue; };
