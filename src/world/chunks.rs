@@ -11,13 +11,17 @@ pub const BLOCK_SIZE: i32 = 8;
 pub const CHUNK_SIZE: i32 = 32;
 
 #[derive(Resource)]
-pub struct Colls(pub HashSet<(IVec2, i32)>);
+// pub struct Colls(pub HashSet<(IVec2, i32)>);
+pub struct Colls(pub HashMap<ChunkPos, HashSet<(IVec2, i32)>>);
 
 #[derive(Resource, Default)]
 pub struct LoadedChunks(HashMap<ChunkPos, (Entity, Entity)>);
 
 #[derive(Event)]
 pub struct ReloadChunks;
+
+#[derive(Event)]
+pub struct ReloadChunk(pub ChunkPos);
 
 #[allow(dead_code)]
 impl LoadedChunks {
@@ -67,6 +71,29 @@ pub fn spawn_chunks_near_player(
     }
 }
 
+pub fn reload_chunk(
+    mut commands: Commands,
+    tilesets: Tilesets,
+    mut reload_event: EventReader<ReloadChunk>,
+    mut loaded_chunks: ResMut<LoadedChunks>,
+    mut colls: ResMut<Colls>,
+    world_storage: Res<WorldStorage>,
+) {
+    let tileset = tilesets.get_by_name("world_tiles").unwrap();
+    for ev in reload_event.iter() {
+        let chunk_pos = ev.0;
+        if !loaded_chunks.0.contains_key(&chunk_pos) { return; };
+
+        despawn_chunk(chunk_pos, &mut commands, &mut loaded_chunks, &mut colls);
+
+        let chunk_data = world_storage.get_chunk_data(chunk_pos).unwrap(); // else this if error
+        let chunk_entity = spawn_chunk(&mut commands, tileset, chunk_pos, chunk_data).unwrap();
+        let wall_chunk_entity = spawn_wall_chunk(&mut commands, tileset, chunk_pos, chunk_data).unwrap();
+        add_colls(&mut colls, chunk_pos, chunk_data);
+        loaded_chunks.add_chunk(chunk_pos, chunk_entity, wall_chunk_entity);
+    }
+}
+
 fn despawn_all_chunks(
     commands: &mut Commands,
     loaded_chunks: &mut ResMut<LoadedChunks>,
@@ -80,6 +107,20 @@ fn despawn_all_chunks(
     colls.0.clear();
 }
 
+fn despawn_chunk(
+    chunk_pos: ChunkPos,
+    commands: &mut Commands,
+    loaded_chunks: &mut ResMut<LoadedChunks>,
+    colls: &mut ResMut<Colls>
+) {
+    let (chunk_entity, wall_chunk_entity) = loaded_chunks.get_chunk(chunk_pos).unwrap();
+    commands.entity(*chunk_entity).despawn_recursive();
+    commands.entity(*wall_chunk_entity).despawn_recursive();
+    loaded_chunks.0.remove(&chunk_pos);
+    // colls.0.clear();
+    colls.0.remove(&chunk_pos);
+}
+
 fn add_colls(
     colls: &mut ResMut<Colls>,
     chunk_pos: ChunkPos,
@@ -89,6 +130,9 @@ fn add_colls(
         warn!("tried to add colls out of bounds! not spawning ({})", chunk_pos.0);
         return;
     };
+
+    // perf: dont clone but reference?
+    let mut hashset: HashSet<(IVec2, i32)> = HashSet::new();
 
     for y in 0..CHUNK_SIZE {
         let mut s = -1;
@@ -107,19 +151,23 @@ fn add_colls(
 
                 if x == CHUNK_SIZE-1 { // if on last block, treat as air (end and add coll)
                     let pos = ivec2(s+chunk_pos.0.x*32,y+chunk_pos.0.y*32);
-                    colls.0.insert((pos, i));
+                    // colls.0.insert((pos, i));
+                    hashset.insert((pos, i));
                 }
             } else { // if air
                 if i == 0 { continue; }; // if no start ignore
 
                 // end and add coll
                 let pos = ivec2(s+chunk_pos.0.x*32,y+chunk_pos.0.y*32);
-                colls.0.insert((pos, i));
+                // colls.0.insert((pos, i));
+                hashset.insert((pos, i));
                 s = -1;
                 i = 0;
             }
         }
     }
+
+    colls.0.insert(chunk_pos, hashset.clone());
 }
 
 // maybe merge both spawn chunks?

@@ -1,6 +1,6 @@
 use bevy::{prelude::*, math::vec3};
 
-use crate::{world::{position::ChunkPos, chunks::ReloadChunks, storage::WorldStorage, block::Block}, physics::{Velocity, Rigidbody}, entities::item::SpawnItem};
+use crate::{world::{position::ChunkPos, chunks::{ReloadChunks, ReloadChunk}, storage::WorldStorage, block::Block}, physics::{Velocity, Rigidbody}, entities::item::SpawnItem};
 
 use super::camera::CursorPosition;
 
@@ -72,13 +72,13 @@ pub fn mouse_input(
     cursor_pos: Res<CursorPosition>,
     mouse_input: Res<Input<MouseButton>>,
     mut world_storage: ResMut<WorldStorage>,
-    mut reload_event: EventWriter<ReloadChunks>,
+    mut reload_event: EventWriter<ReloadChunk>,
     mut item_event: EventWriter<SpawnItem>,
 ) {
     if mouse_input.pressed(MouseButton::Left) {
         let block = world_storage.get_block(cursor_pos.0).unwrap();
-
         if block == Block::Air { return; };
+        let chunk_pos = ChunkPos::from_block_pos(cursor_pos.0);
 
         item_event.send(SpawnItem {
             // position: cursor_pos.0.as_vec2() * 8.0,
@@ -89,9 +89,10 @@ pub fn mouse_input(
             block, // hehe crash here!, fix l8r B)
         });
         world_storage.set_block(cursor_pos.0, Block::Air);
-        reload_event.send(ReloadChunks);
+        reload_event.send(ReloadChunk(chunk_pos));
     } else if mouse_input.pressed(MouseButton::Right) {
+        let chunk_pos = ChunkPos::from_block_pos(cursor_pos.0);
         world_storage.set_block(cursor_pos.0, Block::Dirt);
-        reload_event.send(ReloadChunks);
+        reload_event.send(ReloadChunk(chunk_pos));
     }
 }

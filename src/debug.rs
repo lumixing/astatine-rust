@@ -21,13 +21,15 @@ pub fn draw_colls(
     mut gizmos: Gizmos,
     colls: Res<Colls>
 ) {
-    for (pos, len) in colls.0.iter() {
-        let npos = Vec2 {
-            x: pos.x as f32 * 8.0 + *len as f32 * 4.0 - 4.0,
-            y: pos.y as f32 * 8.0,
-        };
-        gizmos.rect_2d(npos, 0.0, vec2(8.0 * *len as f32, 8.0), Color::GREEN);
-        // gizmos.rect_2d(pos.as_vec2() * 8.0, 0.0, vec2(8.0 * *len as f32, 8.0), Color::GREEN);
+    for (_, hashset) in colls.0.iter() {
+        for (pos, len) in hashset.iter() {
+            let npos = Vec2 {
+                x: pos.x as f32 * 8.0 + *len as f32 * 4.0 - 4.0,
+                y: pos.y as f32 * 8.0,
+            };
+            gizmos.rect_2d(npos, 0.0, vec2(8.0 * *len as f32, 8.0), Color::GREEN);
+            // gizmos.rect_2d(pos.as_vec2() * 8.0, 0.0, vec2(8.0 * *len as f32, 8.0), Color::GREEN);
+        }
     }
 }
 
@@ -40,13 +42,17 @@ pub fn debug_text(
     cursor_pos: Res<CursorPosition>
 ) {
     let (transform, velocity, _player) = player_query.single();
+    let mut coll_count = 0;
+    for (_, hashset) in colls.0.iter() {
+        coll_count += hashset.len();
+    }
 
     egui::Window::new("debug").show(contexts.ctx_mut(), |ui| {
         ui.label(format!("{}fps / {}ms", (1.0/time.delta_seconds()).floor(), (time.delta_seconds()*1000.0).floor()));
         ui.label(format!("wpos: {}", transform.translation.truncate().floor()));
         ui.label(format!("cpos: {}", cursor_pos.0));
         ui.label(format!("vel: {}", velocity.0));
-        ui.label(format!("col: {}", colls.0.iter().count()));
+        ui.label(format!("col: {}", coll_count));
         ui.label(format!("items: {}", item_query.iter().count()));
     });
 }

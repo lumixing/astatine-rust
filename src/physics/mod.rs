@@ -57,45 +57,47 @@ pub fn check_collision(
     for (mut transform, mut velocity, _entity) in q.iter_mut() {
         // let mut should_ground = false;
 
-        for (coll_transform, coll_length) in colls.0.iter() {
-            // vertical collision
-            let coll_pos = Vec3 {
-                x: coll_transform.x as f32 * 8.0 + *coll_length as f32 * 4.0 - 4.0,
-                y: coll_transform.y as f32 * 8.0,
-                z: 0.0 
-            };
-            let vertical_translation = transform.translation + vec3(0.0, velocity.0.y * delta, 0.0);
-            let coll = collide(
-                vertical_translation,
-                transform.scale.truncate(),
-                // (coll_transform.as_vec2().extend(0.0) * 8.0) + *coll_length as f32 * 4.0,
-                coll_pos,
-                vec2(8.0 * *coll_length as f32, 8.0),
-            );
-
-            if let Some(c) = coll {
-                velocity.0.y = 0.0;
-                if c == Collision::Top {
-                    transform.translation.y = (coll_transform.y as f32 * 8.0) + (transform.scale.y / 2.0 + 4.0);
-                    // should_ground = true;
+        for (_, hashset) in colls.0.iter() {
+            for (coll_transform, coll_length) in hashset.iter() {
+                // vertical collision
+                let coll_pos = Vec3 {
+                    x: coll_transform.x as f32 * 8.0 + *coll_length as f32 * 4.0 - 4.0,
+                    y: coll_transform.y as f32 * 8.0,
+                    z: 0.0 
+                };
+                let vertical_translation = transform.translation + vec3(0.0, velocity.0.y * delta, 0.0);
+                let coll = collide(
+                    vertical_translation,
+                    transform.scale.truncate(),
+                    // (coll_transform.as_vec2().extend(0.0) * 8.0) + *coll_length as f32 * 4.0,
+                    coll_pos,
+                    vec2(8.0 * *coll_length as f32, 8.0),
+                );
+    
+                if let Some(c) = coll {
+                    velocity.0.y = 0.0;
+                    if c == Collision::Top {
+                        transform.translation.y = (coll_transform.y as f32 * 8.0) + (transform.scale.y / 2.0 + 4.0);
+                        // should_ground = true;
+                    }
                 }
-            }
-
-            // horizontal collision
-            let horizontal_translation = transform.translation + vec3(velocity.0.x * delta, 0.0, 0.0);
-            let coll = collide(
-                horizontal_translation,
-                transform.scale.truncate(),
-                coll_pos,
-                vec2(8.0 * *coll_length as f32, 8.0),
-            );
-
-            if let Some(c) = coll {
-                velocity.0.x = 0.0;
-                if c == Collision::Right {
-                    transform.translation.x = (coll_transform.x as f32 * 8.0) + (*coll_length * 8) as f32;
-                } else if c == Collision::Left {
-                    transform.translation.x = (coll_transform.x as f32 * 8.0) - 8.0;
+    
+                // horizontal collision
+                let horizontal_translation = transform.translation + vec3(velocity.0.x * delta, 0.0, 0.0);
+                let coll = collide(
+                    horizontal_translation,
+                    transform.scale.truncate(),
+                    coll_pos,
+                    vec2(8.0 * *coll_length as f32, 8.0),
+                );
+    
+                if let Some(c) = coll {
+                    velocity.0.x = 0.0;
+                    if c == Collision::Right {
+                        transform.translation.x = (coll_transform.x as f32 * 8.0) + (*coll_length * 8) as f32;
+                    } else if c == Collision::Left {
+                        transform.translation.x = (coll_transform.x as f32 * 8.0) - 8.0;
+                    }
                 }
             }
         }
