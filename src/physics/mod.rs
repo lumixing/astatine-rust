@@ -47,11 +47,11 @@ fn apply_velocity(
     time: Res<Time>
 ) {
     let delta = time.delta_seconds();
-    for (mut transform, mut velocity, rigidbody) in q.iter_mut() {
+    for (mut transform, mut velocity, _rigidbody) in q.iter_mut() {
         transform.translation += velocity.0.extend(0.0) * delta;
-        if rigidbody.friction {
-            velocity.0.x *= 0.9;
-        }
+        // if rigidbody.friction {
+        //     velocity.0.x *= 0.9;
+        // }
         if velocity.0.x.abs() < 0.01 {
             velocity.0.x = 0.0;
         }
