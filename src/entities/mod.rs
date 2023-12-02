@@ -20,6 +20,7 @@ impl Plugin for EntitiesPlugin {
         app.add_systems(Update,
             (
                 item::spawn,
+                item::check_collisions,
                 arrow::spawn,
                 arrow::rotate,
             ).run_if(in_state(GameState::InGame)).chain(),
