@@ -14,6 +14,7 @@ bevy_ecs_tilemap = { git = "https://github.com/StarArawn/bevy_ecs_tilemap.git" }
 bevy_egui = "0.21.0"
 bevy_hanabi = "0.7.0"
 bevy_tileset = "0.8.0"
+chrono = "0.4.31"
 noise = "0.8.2"
 rand = "0.8.5"
 

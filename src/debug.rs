@@ -1,5 +1,7 @@
-use bevy::{prelude::*, math::vec2};
+use bevy::{prelude::*, math::vec2, render::view::screenshot::ScreenshotManager, window::PrimaryWindow};
 use bevy_egui::{EguiContexts, egui};
+use chrono::prelude::*;
+use std::fs;
 
 use crate::{physics::Velocity, player::{player::Player, camera::CursorPosition}, world::chunks::Colls, entities::item::Item};
 
@@ -55,4 +57,22 @@ pub fn debug_text(
         ui.label(format!("col: {}", coll_count));
         ui.label(format!("items: {}", item_query.iter().count()));
     });
+}
+
+pub fn screenshot(
+    keyboard_input: Res<Input<KeyCode>>,
+    main_window: Query<Entity, With<PrimaryWindow>>,
+    mut screenshot_manager: ResMut<ScreenshotManager>,
+    mut counter: bevy::prelude::Local<u32>
+) {
+    if keyboard_input.just_pressed(KeyCode::F2) {
+        let _ = fs::create_dir_all("./screenshots");
+        let local: DateTime<chrono::Local> = chrono::Local::now();
+        let formatted_date_time = local.format("%Y-%m-%d_%H:%M:%S");
+        let path = format!("./screenshots/{}_{}.png", formatted_date_time, *counter);
+        *counter += 1;
+        screenshot_manager
+            .save_screenshot_to_disk(main_window.single(), path)
+            .unwrap();
+    }
 }

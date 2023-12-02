@@ -36,6 +36,7 @@ pub fn app() -> App {
     app.add_systems(Update, (   
         bevy::window::close_on_esc,
         debug::debug_text,
+        debug::screenshot,
         // debug::chunk_borders,
         // debug::draw_colls,
     ).run_if(in_state(GameState::InGame)));
