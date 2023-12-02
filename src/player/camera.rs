@@ -49,14 +49,16 @@ pub fn update_cursor_position(
 pub fn zoom(
     keyboard_input: Res<Input<KeyCode>>,
     mut q: Query<&mut OrthographicProjection, With<PlayerCamera>>,
+    time: Res<Time>
 ) {
     let mut proj = q.single_mut();
+    let delta = time.delta_seconds();
 
     if keyboard_input.pressed(KeyCode::Minus) {
-        proj.scale += 0.1;
+        proj.scale += 0.1 * delta;
     }
     if keyboard_input.pressed(KeyCode::Equals) {
-        proj.scale -= 0.1;
+        proj.scale -= 0.1 * delta;
     }
     if keyboard_input.pressed(KeyCode::Back) {
         proj.scale = 0.5;

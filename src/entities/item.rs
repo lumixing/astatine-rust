@@ -1,4 +1,5 @@
 use bevy::{prelude::*, sprite::collide_aabb::collide};
+use rand::prelude::*;
 
 use crate::{
     physics::{Rigidbody, Velocity},
@@ -14,12 +15,21 @@ pub struct SpawnItem {
 #[derive(Component)]
 pub struct Item;
 
-pub fn spawn(mut commands: Commands, mut item_event: EventReader<SpawnItem>) {
+#[derive(Component)]
+pub struct AnimationOffset(f32);
+
+pub fn spawn(
+    asset_server: Res<AssetServer>,
+    mut commands: Commands,
+    mut item_event: EventReader<SpawnItem>,
+) {
+    let mut rng = thread_rng();
     for ev in item_event.iter() {
-        commands.spawn((
+        let texture_handle = asset_server.load(ev.block.texture_path());
+        let entity = commands.spawn((
             SpriteBundle {
                 sprite: Sprite {
-                    color: Color::PINK,
+                    color: Color::NONE,
                     ..default()
                 },
                 transform: Transform {
@@ -35,7 +45,21 @@ pub fn spawn(mut commands: Commands, mut item_event: EventReader<SpawnItem>) {
             },
             Item,
             Velocity(Vec2::ZERO),
-        ));
+        )).id();
+
+        let child = commands.spawn((
+            SpriteBundle {
+                texture: texture_handle.clone(),
+                transform: Transform {
+                    scale: Vec3::splat(1.0/8.0), // NO IDEA DONT ASK
+                    ..default()
+                },
+                ..default()
+            },
+            AnimationOffset(rng.gen_range(0.0..100.0))
+        )).id();
+
+        commands.entity(entity).push_children(&[child]);
     }
 }
 
@@ -55,6 +79,19 @@ pub fn check_collisions(
 
         if c.is_some() {
             commands.entity(item_entity).despawn_recursive();
+        }
+    }
+}
+
+pub fn animate(
+    item_query: Query<&Children, With<Item>>,
+    mut child_query: Query<(&mut Transform, &AnimationOffset)>,
+    time: Res<Time>
+) {
+    for children in item_query.iter() {
+        for &child in children {
+            let (mut transform, offset) = child_query.get_mut(child).unwrap();
+            transform.translation.y = (time.elapsed_seconds() * 4.0 + offset.0).sin() * 0.2 + 0.2;
         }
     }
 }

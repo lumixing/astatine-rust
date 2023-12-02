@@ -37,7 +37,7 @@ pub fn app() -> App {
         bevy::window::close_on_esc,
         debug::debug_text,
         // debug::chunk_borders,
-        debug::draw_colls,
+        // debug::draw_colls,
     ).run_if(in_state(GameState::InGame)));
 
     app

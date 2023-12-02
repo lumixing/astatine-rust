@@ -21,6 +21,7 @@ impl Plugin for EntitiesPlugin {
             (
                 item::spawn,
                 item::check_collisions,
+                item::animate,
                 arrow::spawn,
                 arrow::rotate,
             ).run_if(in_state(GameState::InGame)).chain(),

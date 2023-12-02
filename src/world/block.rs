@@ -31,4 +31,14 @@ impl Block {
             Block::Border => true,
         }
     }
+
+    pub fn texture_path(&self) -> &str {
+        match self {
+            Block::Air => "tiles/air.png",
+            Block::Grass => "tiles/grass.png",
+            Block::Dirt => "tiles/dirt.png",
+            Block::Stone => "tiles/stone.png",
+            Block::Border => "tiles/border.png",
+        }
+    }
 }
