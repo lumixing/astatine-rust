@@ -29,7 +29,10 @@ pub fn spawn(mut commands: Commands, mut item_event: EventReader<SpawnItem>) {
                 },
                 ..default()
             },
-            Rigidbody,
+            Rigidbody {
+                grounded: false,
+                friction: false
+            },
             Item,
             Velocity(Vec2::ZERO),
         ));

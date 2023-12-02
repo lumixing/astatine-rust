@@ -18,7 +18,10 @@ pub fn spawn(mut commands: Commands) {
             },
             ..default()
         },
-        Rigidbody,
+        Rigidbody {
+            grounded: false,
+            friction: false
+        },
         Velocity(Vec2::ZERO),
     ));
 }
@@ -42,7 +45,10 @@ pub fn stress(mut commands: Commands) {
                 },
                 ..default()
             },
-            Rigidbody,
+            Rigidbody {
+                grounded: false,
+                friction: false
+            },
             Velocity(Vec2::ZERO),
         ));
     }

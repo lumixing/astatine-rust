@@ -10,7 +10,10 @@ pub struct PhysicsPlugin;
 pub struct Velocity(pub Vec2);
 
 #[derive(Component)]
-pub struct Rigidbody;
+pub struct Rigidbody {
+    pub grounded: bool,
+    pub friction: bool
+}
 
 impl Plugin for PhysicsPlugin {
     fn build(&self, app: &mut App) {
@@ -20,7 +23,7 @@ impl Plugin for PhysicsPlugin {
     //     ).chain());
 
         app.add_systems(Update, (
-            // apply_gravity,
+            apply_gravity,
             check_collision,
             apply_velocity,
         ).run_if(in_state(GameState::InGame)).chain());
@@ -28,10 +31,12 @@ impl Plugin for PhysicsPlugin {
 }
 
 pub fn apply_gravity(
-    mut q: Query<&mut Velocity, With<Rigidbody>>
+    mut q: Query<&mut Velocity, With<Rigidbody>>,
+    time: Res<Time>
 ) {
+    let delta = time.delta_seconds();
     for mut velocity in q.iter_mut() {
-        velocity.0.y += -10.0;
+        velocity.0.y += -512.0 * delta;
         velocity.0.x = velocity.0.x.clamp(-512.0, 512.0);
         velocity.0.y = velocity.0.y.clamp(-512.0, 512.0);
     }
@@ -48,14 +53,15 @@ fn apply_velocity(
 }
 
 pub fn check_collision(
-    mut q: Query<(&mut Transform, &mut Velocity, Entity)>,
+    // mut commands: Commands,
+    mut q: Query<(&mut Transform, &mut Velocity, Entity, &mut Rigidbody)>,
     // mut player_queue: Query<&mut Player>,
     colls: Res<Colls>,
     time: Res<Time>
 ) {
     let delta = time.delta_seconds();
-    for (mut transform, mut velocity, _entity) in q.iter_mut() {
-        // let mut should_ground = false;
+    for (mut transform, mut velocity, _entity, mut rigidbody) in q.iter_mut() {
+        let mut should_ground = false;
 
         for (_, hashset) in colls.0.iter() {
             for (coll_transform, coll_length) in hashset.iter() {
@@ -76,9 +82,13 @@ pub fn check_collision(
     
                 if let Some(c) = coll {
                     velocity.0.y = 0.0;
+                    if rigidbody.friction {
+                        velocity.0.x = 0.0;
+                        // commands.entity(entity).remove::<Rigidbody>();
+                    }
                     if c == Collision::Top {
                         transform.translation.y = (coll_transform.y as f32 * 8.0) + (transform.scale.y / 2.0 + 4.0);
-                        // should_ground = true;
+                        should_ground = true;
                     }
                 }
     
@@ -93,6 +103,10 @@ pub fn check_collision(
     
                 if let Some(c) = coll {
                     velocity.0.x = 0.0;
+                    if rigidbody.friction {
+                        velocity.0.y = 0.0;
+                        // commands.entity(entity).remove::<Rigidbody>();
+                    }
                     if c == Collision::Right {
                         transform.translation.x = (coll_transform.x as f32 * 8.0) + (*coll_length * 8) as f32;
                     } else if c == Collision::Left {
@@ -102,6 +116,7 @@ pub fn check_collision(
             }
         }
 
+        rigidbody.grounded = should_ground;
         // if player_queue.contains(entity) {
             // player_queue.get_mut(entity).unwrap().grounded = should_ground;
         // }

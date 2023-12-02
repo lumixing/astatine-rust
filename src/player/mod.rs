@@ -27,6 +27,7 @@ impl Plugin for PlayerPlugin {
                 camera::update_cursor_position,
                 camera::zoom,
                 player::mouse_input,
+                player::mouse_attack,
             )
                 .run_if(in_state(GameState::InGame))
                 .chain(),
