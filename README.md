@@ -1,6 +1,11 @@
 # astatine
 > 2D sandbox game written in rust
 
+wont be updating this repo anymore  
+new rewrite in lumixing/astatine-test  
+will continue dev when i learn more about bevy  
+dont wanna be writing so many rewrites due to my lack of knowledge :(
+
 still in like pre-pre-pre-alpha  
 updating whenever :)
 
